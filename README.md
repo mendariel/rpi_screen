@@ -1,2 +1,3 @@
-# rpi_screen
+install_volumio_tft_with_screensaver
 rpi_screen
+sudo bash setup_ads7846_touchscreen.sh
