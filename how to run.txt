@@ -1,0 +1,1 @@
+sudo bash setup_ads7846_touchscreen.sh

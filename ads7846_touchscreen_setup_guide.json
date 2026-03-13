@@ -1,0 +1,75 @@
+{
+    "screen_model": "ADS7846 Touchscreen",
+    "compatible_platforms": [
+        "Raspberry Pi 3B",
+        "Debian-based systems",
+        "Volumio"
+    ],
+    "installation_steps": [
+        {
+            "step": "Connect the touchscreen",
+            "description": "Physically connect the ADS7846 touchscreen to the Raspberry Pi GPIO header and ensure it is powered."
+        },
+        {
+            "step": "Verify device detection",
+            "command": "ls /dev/input/event*",
+            "description": "Check if the touchscreen is detected as an input device."
+        },
+        {
+            "step": "Check X11 is running",
+            "command": "ps aux | grep X",
+            "description": "Ensure the X server is active to support graphical input."
+        },
+        {
+            "step": "List input devices",
+            "command": "DISPLAY=:0 xinput",
+            "description": "Identify the touchscreen device ID (usually listed as ADS7846 Touchscreen)."
+        },
+        {
+            "step": "Create calibration config",
+            "file": "/etc/X11/xorg.conf.d/99-calibration.conf",
+            "content": [
+                "Section \"InputClass\"",
+                "    Identifier      \"calibration\"",
+                "    MatchProduct    \"ADS7846 Touchscreen\"",
+                "    Option  \"SwapXY\"        \"0\"      # Do not swap axes",
+                "    Option  \"InvertX\"       \"0\"      # X-axis is correct",
+                "    Option  \"InvertY\"       \"1\"      # Flip Y-axis to correct direction",
+                "EndSection"
+            ],
+            "description": "This configuration ensures correct axis mapping for the touchscreen."
+        },
+        {
+            "step": "Restart X server",
+            "command": "sudo pkill Xorg",
+            "description": "Apply the new calibration settings by restarting the X server."
+        },
+        {
+            "step": "Lock configuration file (optional)",
+            "command": "sudo chattr +i /etc/X11/xorg.conf.d/99-calibration.conf",
+            "description": "Prevent accidental overwrites of the calibration file."
+        }
+    ],
+    "troubleshooting": [
+        {
+            "issue": "Touch input is mirrored horizontally",
+            "solution": "Set InvertX to 1 in the calibration config."
+        },
+        {
+            "issue": "Touch input is mirrored vertically",
+            "solution": "Set InvertY to 1 in the calibration config."
+        },
+        {
+            "issue": "Touch input is rotated",
+            "solution": "Try setting SwapXY to 1 and adjust InvertX/InvertY accordingly."
+        },
+        {
+            "issue": "Calibration file not applied",
+            "solution": "Ensure X11 is running and the file is located in /etc/X11/xorg.conf.d/."
+        }
+    ],
+    "notes": [
+        "Do not run LCD35-show or similar scripts as they may overwrite calibration settings.",
+        "Always test touch input after restarting X server to confirm changes."
+    ]
+}
